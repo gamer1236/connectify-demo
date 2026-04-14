@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign In{% endblock %}
+
+{% block navbar %}
+<!-- Hide navbar on auth page -->
+{% endblock %}
+
+{% block content %}
+<div class="card-wrapper w-full max-w-md mx-auto">
+  <div class="glass-card">
+    
+    <!-- Logo -->
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="12" cy="18" r="7" stroke="Blue" stroke-width="2.2" />
+          <circle cx="24" cy="18" r="7" stroke="Grey" stroke-width="2.2" />
+          <path d="M17.5 12.8C19.2 14.2 20.3 16 20.3 18s-1.1 3.8-2.8 5.2" stroke="rgba(255,255,255,0.8)" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+      </div>
+      <span class="brand-name">Connectify</span>
+    </div>
+
+    <!-- Tab switcher -->
+    <div class="tab-bar" role="tablist">
+      <button class="tab active" id="tab-login" role="tab" aria-selected="true" aria-controls="panel-login" data-target="login">Sign In</button>
+      <button class="tab" id="tab-signup" role="tab" aria-selected="false" aria-controls="panel-signup" data-target="signup">Create Account</button>
+      <span class="tab-indicator" aria-hidden="true"></span>
+    </div>
+
+    <!-- ── LOGIN PANEL ── -->
+    <div class="panel active" id="panel-login" role="tabpanel" aria-labelledby="tab-login">
+      <p class="panel-subtitle">Welcome Back</p>
+
+      <form method="POST" action="{{ url_for('auth') }}">
+        <div class="field-group">
+          <label class="field-label" for="login-email">Email</label>
+          <div class="input-shell" id="email-shell-login">
+            <div class="input-icon">
+              <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="4" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.5" />
+                <path d="M2 7l8 5 8-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              </svg>
+            </div>
+            <input type="text" id="login-email" name="email" class="text-input" placeholder="username" autocomplete="email" spellcheck="false" required />
+            <span class="domain-suffix" aria-hidden="true">@silicon.ac.in</span>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="label-row">
+            <label class="field-label" for="login-password">Password</label>
+            <button type="button" class="forgot-link" tabindex="0">Forgot password?</button>
+          </div>
+          <div class="input-shell" id="pass-shell-login">
+            <div class="input-icon">
+              <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="4" y="9" width="12" height="9" rx="2" stroke="currentColor" stroke-width="1.5" />
+                <path d="M7 9V6a3 3 0 016 0v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              </svg>
+            </div>
+            <input type="password" id="login-password" name="password" class="text-input password-input" placeholder="" autocomplete="current-password" required />
+            <button type="button" class="eye-toggle" data-target="login-password" aria-label="Toggle password visibility">
+              <svg class="eye-open" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 10s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z" stroke="currentColor" stroke-width="1.5" />
+                <circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5" />
+              </svg>
+              <svg class="eye-closed hidden" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 3l14 14M8.5 8.6a2.5 2.5 0 003.4 3.4M1 10s3.5-6 9-6c1.5 0 2.9.4 4.1 1M19 10s-1.2 1.9-3.1 3.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="cta-btn" id="login-submit-btn">
+          <span class="btn-text">Sign In</span>
+          <span class="btn-shine" aria-hidden="true"></span>
+        </button>
+      </form>
+    </div>
+
+    <!-- ── SIGNUP PANEL ── -->
+    <div class="panel" id="panel-signup" role="tabpanel" aria-labelledby="tab-signup">
+      <p class="panel-subtitle">Join Connectify. Your campus network awaits.</p>
+
+      <form method="POST" action="{{ url_for('auth') }}">
+        <div class="name-row">
+          <div class="field-group">
+            <label class="field-label" for="signup-fname">First Name</label>
+            <div class="input-shell">
+              <div class="input-icon">
+                <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="10" cy="7" r="3" stroke="currentColor" stroke-width="1.5" />
+                  <path d="M3 17c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+              </div>
+              <input type="text" id="signup-fname" name="fname" class="text-input" placeholder="First" autocomplete="given-name" required />
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="signup-lname">Last Name</label>
+            <div class="input-shell">
+              <input type="text" id="signup-lname" name="lname" class="text-input" placeholder="Last" style="padding-left:1rem" autocomplete="family-name" required />
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="signup-email">Email</label>
+          <div class="input-shell" id="email-shell-signup">
+            <div class="input-icon">
+              <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="4" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.5" />
+                <path d="M2 7l8 5 8-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              </svg>
+            </div>
+            <input type="text" id="signup-email" name="email" class="text-input" placeholder="username" autocomplete="off" spellcheck="false" required />
+            <span class="domain-suffix" aria-hidden="true">@silicon.ac.in</span>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="signup-password">Password</label>
+          <div class="input-shell" id="pass-shell-signup">
+            <div class="input-icon">
+              <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="4" y="9" width="12" height="9" rx="2" stroke="currentColor" stroke-width="1.5" />
+                <path d="M7 9V6a3 3 0 016 0v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              </svg>
+            </div>
+            <input type="password" id="signup-password" name="password" class="text-input password-input" placeholder="Create password" autocomplete="new-password" required />
+            <button type="button" class="eye-toggle" data-target="signup-password" aria-label="Toggle password visibility">
+              <svg class="eye-open" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 10s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z" stroke="currentColor" stroke-width="1.5" />
+                <circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5" />
+              </svg>
+              <svg class="eye-closed hidden" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 3l14 14M8.5 8.6a2.5 2.5 0 003.4 3.4M1 10s3.5-6 9-6c1.5 0 2.9.4 4.1 1M19 10s-1.2 1.9-3.1 3.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              </svg>
+            </button>
+          </div>
+          <!-- Strength bar -->
+          <div class="strength-bar" id="strength-bar" aria-label="Password strength">
+            <div class="strength-seg" data-index="0"></div>
+            <div class="strength-seg" data-index="1"></div>
+            <div class="strength-seg" data-index="2"></div>
+            <div class="strength-seg" data-index="3"></div>
+          </div>
+          <span class="strength-label" id="strength-label"></span>
+        </div>
+
+        <button type="submit" class="cta-btn" id="signup-submit-btn">
+          <span class="btn-text">Create Account</span>
+          <span class="btn-shine" aria-hidden="true"></span>
+        </button>
+
+        <p class="terms-note">By signing up you agree to our <a href="#" class="terms-link">Terms of Service</a> &amp; <a href="#" class="terms-link">Privacy Policy</a>.</p>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

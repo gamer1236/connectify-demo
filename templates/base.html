@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Connectify — {% block title %}Demo{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap"
+    rel="stylesheet" />
+  <!-- Tailwind CSS via CDN for rapid responsive layout design while keeping existing UI elements -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body class="min-h-screen bg-[#f4f6f9] text-[#0f172a] font-['DM_Sans'] relative overflow-x-hidden flex flex-col items-center justify-start pt-8 pb-8 !overflow-y-auto">
+
+  <!-- ── Animated background bubbles ── -->
+  <div class="scene" id="bubbleScene" aria-hidden="true"></div>
+
+  <!-- Navigation bar (Hide on Auth page) -->
+  {% block navbar %}
+  <nav class="fixed top-0 left-0 w-full z-50 glass-card !rounded-none !py-4 flex justify-between items-center px-8" style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(12px);">
+    <div class="brand !mb-0 flex items-center gap-2">
+      <div class="brand-icon !w-8 !h-8 p-1">
+        <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="12" cy="18" r="7" stroke="Blue" stroke-width="2.2" />
+          <circle cx="24" cy="18" r="7" stroke="Grey" stroke-width="2.2" />
+          <path d="M17.5 12.8C19.2 14.2 20.3 16 20.3 18s-1.1 3.8-2.8 5.2" stroke="rgba(255,255,255,0.8)"
+            stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+      </div>
+      <span class="brand-name text-xl">Connectify</span>
+    </div>
+    <div class="flex gap-6 font-['Outfit'] font-semibold">
+      <a href="{{ url_for('discovery') }}" class="text-gray-700 hover:text-blue-600 transition-colors">Discovery</a>
+      <a href="{{ url_for('network') }}" class="text-gray-700 hover:text-blue-600 transition-colors">Network</a>
+      <a href="{{ url_for('profile') }}" class="text-gray-700 hover:text-blue-600 transition-colors">My Profile</a>
+      <a href="{{ url_for('auth') }}" class="text-gray-700 hover:text-red-500 transition-colors">Sign Out</a>
+    </div>
+  </nav>
+  {% endblock %}
+
+  <!-- ── Main Content ── -->
+  <main class="w-full h-full flex items-start justify-center relative z-10 {% block main_extra_classes %}{% endblock %}">
+    {% block content %}
+    {% endblock %}
+  </main>
+
+  <!-- Toast Element -->
+  <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+
+</html>

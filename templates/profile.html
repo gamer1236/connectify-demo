@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block main_extra_classes %}py-10 mt-10 h-auto min-h-screen items-start{% endblock %}
+
+{% block extra_css %}
+{% endblock %}
+
+{% block content %}
+<div class="card-wrapper w-full max-w-4xl mx-auto overflow-hidden pb-10 mt-5">
+  <div class="glass-card">
+    <div class="text-center mb-6">
+      <img src="{{ current_user.get('profile_pic', 'https://i.pravatar.cc/150?img=3') }}" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-white shadow-lg object-cover">
+      <h2 class="text-2xl font-bold" style="font-family: var(--font-head); color: var(--text-primary);">Edit Your Profile</h2>
+      <p class="text-sm text-gray-500">Keep your network tags up to date.</p>
+    </div>
+
+    <!-- Hidden div to pass user arrays to JS for Discovery logic if needed, but here we just render them active directly -->
+    <form method="POST" action="{{ url_for('profile') }}" id="profileForm">
+      
+      <!-- Basics row -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="field-group">
+          <label class="field-label" for="full_name">Full Name</label>
+          <div class="input-shell">
+            <input type="text" id="full_name" name="full_name" class="text-input pl-4" value="{{ current_user.get('name', session.get('user_name', '')) }}" required />
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="gender">Gender</label>
+          <div class="input-shell">
+            <select id="gender" name="gender" class="text-input pl-4 bg-transparent outline-none appearance-none" style="width:100%" required>
+              <option value="Male" {% if current_user.get('gender') == 'Male' %}selected{% endif %}>Male</option>
+              <option value="Female" {% if current_user.get('gender') == 'Female' %}selected{% endif %}>Female</option>
+              <option value="Non-binary" {% if current_user.get('gender') == 'Non-binary' %}selected{% endif %}>Non-binary</option>
+              <option value="Prefer not to say" {% if current_user.get('gender') == 'Prefer not to say' %}selected{% endif %}>Prefer not to say</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-group md:col-span-2">
+          <label class="field-label" for="location">Location / Hometown</label>
+          <div class="input-shell">
+            <input type="text" id="location" name="location" class="text-input pl-4" value="{{ current_user.get('location', '') }}" placeholder="e.g. New York, USA" />
+          </div>
+        </div>
+        <div class="field-group md:col-span-2">
+          <label class="field-label" for="bio">Short Bio</label>
+          <div class="input-shell" style="height: auto;">
+            <textarea id="bio" name="bio" rows="2" class="text-input pl-4 py-2 w-full bg-transparent resize-none outline-none" placeholder="Write a little about yourself...">{{ current_user.get('bio', '') }}</textarea>
+          </div>
+        </div>
+      </div>
+
+      <hr class="my-6 border-white/40">
+      
+      <!-- Hidden inputs -->
+      <input type="hidden" name="interests" id="hidden_interests">
+      <input type="hidden" name="talents" id="hidden_talents">
+      <input type="hidden" name="hobbies" id="hidden_hobbies">
+      <input type="hidden" name="life_aim" id="hidden_life_aim">
+
+      <h3 class="font-bold tracking-widest text-[#1a5aff] mb-4 font-['Outfit'] text-lg border-b border-black/10 pb-2">Interests</h3>
+      <div class="flex flex-wrap gap-2 mb-8" id="cat_interests">
+        {% for item in INTERESTS_LIST %}
+          <span class="tag-badge-selectable border cursor-pointer text-xs px-3 py-1.5 rounded-full transition-all {% if item in current_user.get('interests', []) %}bg-blue-500 text-white border-blue-500 active{% else %}border-blue-200 text-gray-600 hover:bg-blue-50{% endif %}" data-val="{{ item }}">{{ item }}</span>
+        {% endfor %}
+      </div>
+
+      <h3 class="font-bold tracking-widest text-[#1a5aff] mb-4 font-['Outfit'] text-lg border-b border-black/10 pb-2">Talents</h3>
+      <div class="flex flex-wrap gap-2 mb-8" id="cat_talents">
+        {% for item in TALENTS_LIST %}
+          <span class="tag-badge-selectable border cursor-pointer text-xs px-3 py-1.5 rounded-full transition-all {% if item in current_user.get('talents', []) %}bg-blue-500 text-white border-blue-500 active{% else %}border-blue-200 text-gray-600 hover:bg-blue-50{% endif %}" data-val="{{ item }}">{{ item }}</span>
+        {% endfor %}
+      </div>
+
+      <h3 class="font-bold tracking-widest text-[#1a5aff] mb-4 font-['Outfit'] text-lg border-b border-black/10 pb-2">Hobbies</h3>
+      <div class="flex flex-wrap gap-2 mb-8" id="cat_hobbies">
+        {% for item in HOBBIES_LIST %}
+          <span class="tag-badge-selectable border cursor-pointer text-xs px-3 py-1.5 rounded-full transition-all {% if item in current_user.get('hobbies', []) %}bg-blue-500 text-white border-blue-500 active{% else %}border-blue-200 text-gray-600 hover:bg-blue-50{% endif %}" data-val="{{ item }}">{{ item }}</span>
+        {% endfor %}
+      </div>
+
+      <h3 class="font-bold tracking-widest text-[#1a5aff] mb-4 font-['Outfit'] text-lg border-b border-black/10 pb-2">Life Goals</h3>
+      <div class="flex flex-wrap gap-2 mb-8" id="cat_life_aim">
+        {% for item in GOALS_LIST %}
+          <span class="tag-badge-selectable border cursor-pointer text-xs px-3 py-1.5 rounded-full transition-all {% if item in current_user.get('life_aim', []) %}bg-blue-500 text-white border-blue-500 active{% else %}border-blue-200 text-gray-600 hover:bg-blue-50{% endif %}" data-val="{{ item }}">{{ item }}</span>
+        {% endfor %}
+      </div>
+
+      <button type="submit" class="cta-btn mt-6" id="saveProfileBtn" onclick="showToast('✅ Profile Updated', 3000)">
+        <span class="btn-text">Save Changes</span>
+        <span class="btn-shine" aria-hidden="true"></span>
+      </button>
+
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% endblock %}

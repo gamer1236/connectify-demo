@@ -1,0 +1,156 @@
+/* Custom CSS added for Discovery Map and Networking Grid */
+
+/* Discovery Map Area */
+.discovery-map {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  height: 600px;
+  margin: 0 auto;
+  border-radius: var(--radius-card);
+}
+
+.map-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: transform 0.3s var(--ease-spring), z-index 0s;
+}
+
+.map-node:hover {
+  transform: translate(-50%, -50%) scale(1.15);
+  z-index: 50;
+}
+
+.node-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 16px rgba(0, 20, 80, 0.15);
+  object-fit: cover;
+  background: var(--input-bg);
+  transition: border-color 0.3s;
+}
+.map-node:hover .node-avatar {
+  border-color: var(--blue-bright);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+.node-center .node-avatar {
+  width: 90px;
+  height: 90px;
+  border-color: var(--blue-vivid);
+  box-shadow: 0 0 20px rgba(26, 90, 255, 0.4);
+}
+
+.node-label {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  white-space: nowrap;
+}
+
+/* Modal Styling */
+.profile-modal {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -40%);
+  opacity: 0;
+  z-index: 100;
+  width: 320px;
+  pointer-events: none;
+  transition: opacity 0.3s, transform 0.3s var(--ease-spring);
+}
+.profile-modal.show {
+  display: block;
+  opacity: 1;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+}
+
+/* Badge for tags */
+.tag-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--blue-vivid);
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-right: 6px;
+  margin-bottom: 6px;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(4px);
+  z-index: 99;
+}
+.modal-overlay.show {
+  display: block;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.1);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,0,0,0.2);
+}
+
+/* Universal Glass Card Black Text Enforcement */
+.glass-card {
+  color: #000 !important;
+}
+
+.glass-card h1, .glass-card h2, .glass-card h3, .glass-card h4, .glass-card p, .glass-card span, .glass-card label, .glass-card input, .glass-card select, .glass-card textarea {
+  color: #000;
+}
+
+/* Specific inputs/labels */
+.glass-card .field-label {
+  color: rgba(0,0,0,0.85) !important;
+}
+.glass-card .text-input {
+  color: #000 !important;
+}
+.glass-card .text-input::placeholder {
+  color: rgba(0,0,0,0.5) !important;
+}
+.glass-card select option {
+  color: #000;
+}
+
+/* Exceptions: Elements that should retain white text because they are blue or CTA buttons */
+.glass-card .active,
+.glass-card .bg-blue-500,
+.glass-card .bg-blue-600,
+.glass-card .text-white,
+.glass-card .cta-btn,
+.glass-card .btn-text,
+.glass-card .cta-btn * {
+  color: #fff !important;
+}

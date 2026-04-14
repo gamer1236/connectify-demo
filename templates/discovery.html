@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Discovery{% endblock %}
+
+{% block main_extra_classes %}pt-24{% endblock %}
+
+{% block content %}
+<div class="w-full h-full flex flex-col items-center pb-20">
+  <div class="text-center mb-8 relative z-10 glass-card !p-4 !rounded-full inline-block px-8 py-2">
+    <h2 class="text-xl font-bold font-['Outfit'] text-[var(--text-primary)]">People Nearby</h2>
+    <p class="text-xs text-[var(--text-secondary)]">Click nodes to discover shared similarities</p>
+  </div>
+
+  <!-- Hidden Current User Data for Similarity Checking -->
+  <div id="currentUserData" class="hidden" 
+       data-interests="{{ current_user.get('interests', []) | join(',') }}" 
+       data-talents="{{ current_user.get('talents', []) | join(',') }}" 
+       data-hobbies="{{ current_user.get('hobbies', []) | join(',') }}" 
+       data-aim="{{ current_user.get('life_aim', []) | join(',') }}">
+  </div>
+
+  <div class="glass-card w-[95%] max-w-[900px] h-[650px] flex items-center justify-center relative shadow-2xl bg-white/20 z-10">
+    <div class="discovery-map" id="discoveryMap">
+      
+      <!-- Current User Node (Center) -->
+      <div class="map-node node-center" style="top: 50%; left: 50%; z-index: 10;">
+        <img src="{{ current_user.get('profile_pic', 'https://i.pravatar.cc/150?img=3') }}" alt="You" class="node-avatar">
+        <div class="node-label">You</div>
+      </div>
+
+      <!-- Nearby Users -->
+      {% for user in nearby_users %}
+        <div class="map-node nearby-node" data-id="{{ user.id }}" 
+             data-name="{{ user.name }}" 
+             data-bio="{{ user.bio }}"
+             data-goal="{{ user.life_aim | join(',') }}"
+             data-interests="{{ user.interests | join(',') }}"
+             data-talents="{{ user.talents | join(',') }}"
+             data-hobbies="{{ user.hobbies | join(',') }}">
+          <img src="{{ user.profile_pic }}" alt="{{ user.name }}" class="node-avatar">
+          <div class="node-label">{{ user.name }}</div>
+        </div>
+      {% endfor %}
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal Profile View -->
+<div class="modal-overlay" id="profileModalOverlay"></div>
+<div class="profile-modal glass-card" id="profileModal">
+  <div class="text-right mb-2">
+    <button id="closeModalBtn" class="text-gray-500 hover:text-black font-bold">&times;</button>
+  </div>
+  <div class="flex items-center gap-4 mb-4">
+    <img src="" id="modAvatar" class="w-16 h-16 rounded-full border-2 border-blue-400" alt="Avatar">
+    <div>
+      <h3 id="modName" class="font-bold font-['Outfit'] text-lg"></h3>
+      <p id="modBio" class="text-xs italic text-gray-700"></p>
+    </div>
+  </div>
+  
+  <p class="font-bold text-sm text-[var(--blue-vivid)] mb-1">Similarity Match:</p>
+  <div class="mb-4">
+    <div id="modSimilarities"></div>
+    <p id="noMatchesMsg" class="text-xs text-gray-500 hidden mt-2">No exact matches found, but still worth connecting!</p>
+  </div>
+
+  <button class="cta-btn !mt-2 !py-2 !text-sm" id="btnSendFriend">
+    <span class="btn-text">Send Connect Request</span>
+    <span class="btn-shine" aria-hidden="true"></span>
+  </button>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% endblock %}
