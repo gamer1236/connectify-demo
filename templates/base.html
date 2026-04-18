@@ -36,11 +36,15 @@
       </div>
       <span class="brand-name text-xl">Connectify</span>
     </div>
-    <div class="flex gap-6 font-['Outfit'] font-semibold">
+    <div class="flex gap-6 font-['Outfit'] font-semibold items-center">
       <a href="{{ url_for('discovery') }}" class="text-gray-700 hover:text-blue-600 transition-colors">Discovery</a>
       <a href="{{ url_for('network') }}" class="text-gray-700 hover:text-blue-600 transition-colors">Network</a>
+      <a href="{{ url_for('activity') }}" class="text-gray-700 hover:text-blue-600 transition-colors relative">
+        Activity
+        <span class="absolute -top-1.5 -right-3 w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+      </a>
       <a href="{{ url_for('profile') }}" class="text-gray-700 hover:text-blue-600 transition-colors">My Profile</a>
-      <a href="{{ url_for('auth') }}" class="text-gray-700 hover:text-red-500 transition-colors">Sign Out</a>
+      <a href="{{ url_for('logout') }}" class="text-gray-700 hover:text-red-500 transition-colors">Sign Out</a>
     </div>
   </nav>
   {% endblock %}

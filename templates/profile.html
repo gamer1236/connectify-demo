@@ -11,80 +11,173 @@
 <div class="card-wrapper w-full max-w-4xl mx-auto overflow-hidden pb-10 mt-5">
   <div class="glass-card">
     <div class="text-center mb-6">
-      <img src="{{ current_user.get('profile_pic', 'https://i.pravatar.cc/150?img=3') }}" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-white shadow-lg object-cover">
-      <h2 class="text-2xl font-bold" style="font-family: var(--font-head); color: var(--text-primary);">Edit Your Profile</h2>
+      <img src="{{ current_user.get('profile_pic', 'https://i.pravatar.cc/150?img=3') }}"
+        class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-white shadow-lg object-cover">
+      <h2 class="text-2xl font-bold" style="font-family: var(--font-head); color: var(--text-primary);">Edit Your
+        Profile</h2>
       <p class="text-sm text-gray-500">Keep your network tags up to date.</p>
     </div>
 
     <!-- Hidden div to pass user arrays to JS for Discovery logic if needed, but here we just render them active directly -->
-    <form method="POST" action="{{ url_for('profile') }}" id="profileForm">
-      
+    <form method="POST" action="{{ url_for('profile') }}" id="profileForm" enctype="multipart/form-data">
+
       <!-- Basics row -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div class="field-group">
           <label class="field-label" for="full_name">Full Name</label>
           <div class="input-shell">
-            <input type="text" id="full_name" name="full_name" class="text-input pl-4" value="{{ current_user.get('name', session.get('user_name', '')) }}" required />
+            <input type="text" id="full_name" name="full_name" class="text-input pl-4"
+              value="{{ current_user.get('name', session.get('user_name', '')) }}" required />
           </div>
         </div>
         <div class="field-group">
           <label class="field-label" for="gender">Gender</label>
           <div class="input-shell">
-            <select id="gender" name="gender" class="text-input pl-4 bg-transparent outline-none appearance-none" style="width:100%" required>
-              <option value="Male" {% if current_user.get('gender') == 'Male' %}selected{% endif %}>Male</option>
-              <option value="Female" {% if current_user.get('gender') == 'Female' %}selected{% endif %}>Female</option>
-              <option value="Non-binary" {% if current_user.get('gender') == 'Non-binary' %}selected{% endif %}>Non-binary</option>
-              <option value="Prefer not to say" {% if current_user.get('gender') == 'Prefer not to say' %}selected{% endif %}>Prefer not to say</option>
+            <select id="gender" name="gender" class="text-input pl-4 bg-transparent outline-none appearance-none"
+              style="width:100%" required>
+              <option value="Male" {% if current_user.get('gender')=='Male' %}selected{% endif %}>Male</option>
+              <option value="Female" {% if current_user.get('gender')=='Female' %}selected{% endif %}>Female</option>
+              <option value="Non-binary" {% if current_user.get('gender')=='Non-binary' %}selected{% endif %}>Non-binary
+              </option>
+              <option value="Prefer not to say" {% if current_user.get('gender')=='Prefer not to say' %}selected{% endif
+                %}>Prefer not to say</option>
             </select>
           </div>
         </div>
         <div class="field-group md:col-span-2">
           <label class="field-label" for="location">Location / Hometown</label>
           <div class="input-shell">
-            <input type="text" id="location" name="location" class="text-input pl-4" value="{{ current_user.get('location', '') }}" placeholder="e.g. New York, USA" />
+            <input type="text" id="location" name="location" class="text-input pl-4"
+              value="{{ current_user.get('location', '') }}" placeholder="e.g. New York, USA" />
           </div>
         </div>
         <div class="field-group md:col-span-2">
           <label class="field-label" for="bio">Short Bio</label>
           <div class="input-shell" style="height: auto;">
-            <textarea id="bio" name="bio" rows="2" class="text-input pl-4 py-2 w-full bg-transparent resize-none outline-none" placeholder="Write a little about yourself...">{{ current_user.get('bio', '') }}</textarea>
+            <textarea id="bio" name="bio" rows="2"
+              class="text-input pl-4 py-2 w-full bg-transparent resize-none outline-none"
+              placeholder="Write a little about yourself...">{{ current_user.get('bio', '') }}</textarea>
           </div>
         </div>
       </div>
 
       <hr class="my-6 border-white/40">
-      
+
       <!-- Hidden inputs -->
-      <input type="hidden" name="interests" id="hidden_interests">
-      <input type="hidden" name="talents" id="hidden_talents">
-      <input type="hidden" name="hobbies" id="hidden_hobbies">
-      <input type="hidden" name="life_aim" id="hidden_life_aim">
+      <input type="hidden" name="interests" id="hidden_interests"
+        value="{{ current_user.get('interests', [])|join(',') }}">
+      <input type="hidden" name="talents" id="hidden_talents" value="{{ current_user.get('talents', [])|join(',') }}">
+      <input type="hidden" name="hobbies" id="hidden_hobbies" value="{{ current_user.get('hobbies', [])|join(',') }}">
+      <input type="hidden" name="life_aim" id="hidden_life_aim"
+        value="{{ current_user.get('life_aim', [])|join(',') }}">
 
-      <h3 class="font-bold tracking-widest text-[#1a5aff] mb-4 font-['Outfit'] text-lg border-b border-black/10 pb-2">Interests</h3>
-      <div class="flex flex-wrap gap-2 mb-8" id="cat_interests">
-        {% for item in INTERESTS_LIST %}
-          <span class="tag-badge-selectable border cursor-pointer text-xs px-3 py-1.5 rounded-full transition-all {% if item in current_user.get('interests', []) %}bg-blue-500 text-white border-blue-500 active{% else %}border-blue-200 text-gray-600 hover:bg-blue-50{% endif %}" data-val="{{ item }}">{{ item }}</span>
+      <div class="flex justify-between items-center border-b border-black/10 pb-2 mb-4">
+        <h3 class="font-bold tracking-widest text-[#1a5aff] font-['Outfit'] text-lg m-0">Interests</h3>
+        <button type="button"
+          class="btn-edit-category text-sm font-semibold bg-gray-100 hover:bg-gray-200 text-gray-700 py-1 px-3 rounded"
+          data-category="interests">Edit</button>
+      </div>
+      <div class="flex flex-wrap gap-2 mb-8" id="display_interests">
+        {% for item in current_user.get('interests', []) %}
+        <span class="tag-badge bg-blue-500 text-white border border-blue-500 text-xs px-3 py-1.5 rounded-full"
+          data-val="{{ item }}">{{ item }}</span>
         {% endfor %}
       </div>
 
-      <h3 class="font-bold tracking-widest text-[#1a5aff] mb-4 font-['Outfit'] text-lg border-b border-black/10 pb-2">Talents</h3>
-      <div class="flex flex-wrap gap-2 mb-8" id="cat_talents">
-        {% for item in TALENTS_LIST %}
-          <span class="tag-badge-selectable border cursor-pointer text-xs px-3 py-1.5 rounded-full transition-all {% if item in current_user.get('talents', []) %}bg-blue-500 text-white border-blue-500 active{% else %}border-blue-200 text-gray-600 hover:bg-blue-50{% endif %}" data-val="{{ item }}">{{ item }}</span>
+      <div class="flex justify-between items-center border-b border-black/10 pb-2 mb-4">
+        <h3 class="font-bold tracking-widest text-[#1a5aff] font-['Outfit'] text-lg m-0">Talents</h3>
+        <button type="button"
+          class="btn-edit-category text-sm font-semibold bg-gray-100 hover:bg-gray-200 text-gray-700 py-1 px-3 rounded"
+          data-category="talents">Edit</button>
+      </div>
+      <!-- Included a specific wrapper logic for forms since files apply here -->
+      <!-- Included a specific wrapper logic for forms since files apply here -->
+      <div class="flex flex-col gap-4 mb-8" id="display_talents">
+        {% for item in current_user.get('talents', []) %}
+        {% set ns = namespace(showcase=none) %}
+        {% for s in current_user.get('showcases', []) %}
+        {% if s.type == 'talent' and s.topic == item %}
+        {% set ns.showcase = s.file %}
+        {% endif %}
+        {% endfor %}
+        <div class="flex flex-col gap-2 border-b border-gray-100 pb-3">
+          <div class="flex items-center gap-3">
+            <span class="tag-badge bg-blue-500 text-white border border-blue-500 text-xs px-3 py-1.5 rounded-full"
+              data-val="{{ item }}">{{ item }}</span>
+            <span class="text-xs text-gray-400 italic">Saved</span>
+          </div>
+          {% if ns.showcase %}
+          {% if ns.showcase.endswith('.mp4') or ns.showcase.endswith('.webm') or ns.showcase.endswith('.mov') %}
+          <video src="{{ url_for('static', filename='uploads/' + ns.showcase) }}" controls
+            class="max-w-[500px] max-h-[400px] rounded-lg object-contain shadow-md border border-gray-200"></video>
+          <a href="{{ url_for('static', filename='uploads/' + ns.showcase) }}" target="_blank"
+            class="text-blue-600 font-semibold text-sm hover:underline mt-1 w-fit flex items-center gap-1">
+            <span class="text-lg leading-none">⛶</span> View Full Video
+          </a>
+          {% else %}
+          <img src="{{ url_for('static', filename='uploads/' + ns.showcase) }}"
+            class="max-w-[500px] max-h-[400px] rounded-lg object-contain shadow-md border border-gray-200">
+          <a href="{{ url_for('static', filename='uploads/' + ns.showcase) }}" target="_blank"
+            class="text-blue-600 font-semibold text-sm hover:underline mt-1 w-fit flex items-center gap-1">
+            <span class="text-lg leading-none">⛶</span> View Full Image
+          </a>
+          {% endif %}
+          {% endif %}
+        </div>
         {% endfor %}
       </div>
 
-      <h3 class="font-bold tracking-widest text-[#1a5aff] mb-4 font-['Outfit'] text-lg border-b border-black/10 pb-2">Hobbies</h3>
-      <div class="flex flex-wrap gap-2 mb-8" id="cat_hobbies">
-        {% for item in HOBBIES_LIST %}
-          <span class="tag-badge-selectable border cursor-pointer text-xs px-3 py-1.5 rounded-full transition-all {% if item in current_user.get('hobbies', []) %}bg-blue-500 text-white border-blue-500 active{% else %}border-blue-200 text-gray-600 hover:bg-blue-50{% endif %}" data-val="{{ item }}">{{ item }}</span>
+      <div class="flex justify-between items-center border-b border-black/10 pb-2 mb-4">
+        <h3 class="font-bold tracking-widest text-[#1a5aff] font-['Outfit'] text-lg m-0">Hobbies</h3>
+        <button type="button"
+          class="btn-edit-category text-sm font-semibold bg-gray-100 hover:bg-gray-200 text-gray-700 py-1 px-3 rounded"
+          data-category="hobbies">Edit</button>
+      </div>
+      <div class="flex flex-col gap-4 mb-8" id="display_hobbies">
+        {% for item in current_user.get('hobbies', []) %}
+        {% set ns = namespace(showcase=none) %}
+        {% for s in current_user.get('showcases', []) %}
+        {% if s.type == 'hobby' and s.topic == item %}
+        {% set ns.showcase = s.file %}
+        {% endif %}
+        {% endfor %}
+        <div class="flex flex-col gap-2 border-b border-gray-100 pb-3">
+          <div class="flex items-center gap-3">
+            <span class="tag-badge bg-blue-500 text-white border border-blue-500 text-xs px-3 py-1.5 rounded-full"
+              data-val="{{ item }}">{{ item }}</span>
+            <span class="text-xs text-gray-400 italic">Saved</span>
+          </div>
+          {% if ns.showcase %}
+          {% if ns.showcase.endswith('.mp4') or ns.showcase.endswith('.webm') or ns.showcase.endswith('.mov') %}
+          <video src="{{ url_for('static', filename='uploads/' + ns.showcase) }}" controls
+            class="max-w-[500px] max-h-[400px] rounded-lg object-contain shadow-md border border-gray-200"></video>
+          <a href="{{ url_for('static', filename='uploads/' + ns.showcase) }}" target="_blank"
+            class="text-blue-600 font-semibold text-sm hover:underline mt-1 w-fit flex items-center gap-1">
+            <span class="text-lg leading-none">⛶</span> View Full Video
+          </a>
+          {% else %}
+          <img src="{{ url_for('static', filename='uploads/' + ns.showcase) }}"
+            class="max-w-[500px] max-h-[400px] rounded-lg object-contain shadow-md border border-gray-200">
+          <a href="{{ url_for('static', filename='uploads/' + ns.showcase) }}" target="_blank"
+            class="text-blue-600 font-semibold text-sm hover:underline mt-1 w-fit flex items-center gap-1">
+            <span class="text-lg leading-none">⛶</span> View Full Image
+          </a>
+          {% endif %}
+          {% endif %}
+        </div>
         {% endfor %}
       </div>
 
-      <h3 class="font-bold tracking-widest text-[#1a5aff] mb-4 font-['Outfit'] text-lg border-b border-black/10 pb-2">Life Goals</h3>
-      <div class="flex flex-wrap gap-2 mb-8" id="cat_life_aim">
-        {% for item in GOALS_LIST %}
-          <span class="tag-badge-selectable border cursor-pointer text-xs px-3 py-1.5 rounded-full transition-all {% if item in current_user.get('life_aim', []) %}bg-blue-500 text-white border-blue-500 active{% else %}border-blue-200 text-gray-600 hover:bg-blue-50{% endif %}" data-val="{{ item }}">{{ item }}</span>
+      <div class="flex justify-between items-center border-b border-black/10 pb-2 mb-4">
+        <h3 class="font-bold tracking-widest text-[#1a5aff] font-['Outfit'] text-lg m-0">Life Goals</h3>
+        <button type="button"
+          class="btn-edit-category text-sm font-semibold bg-gray-100 hover:bg-gray-200 text-gray-700 py-1 px-3 rounded"
+          data-category="life_aim">Edit</button>
+      </div>
+      <div class="flex flex-wrap gap-2 mb-8" id="display_life_aim">
+        {% for item in current_user.get('life_aim', []) %}
+        <span class="tag-badge bg-blue-500 text-white border border-blue-500 text-xs px-3 py-1.5 rounded-full"
+          data-val="{{ item }}">{{ item }}</span>
         {% endfor %}
       </div>
 
@@ -96,8 +189,70 @@
     </form>
   </div>
 </div>
+<!-- Category Edit Modal -->
+<div id="categoryModal"
+  class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/40 backdrop-blur-sm">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden relative">
+    <!-- Header -->
+    <div class="flex justify-between items-center px-6 py-4 border-b border-gray-100 shrink-0">
+      <h3 class="text-xl font-bold font-['Outfit'] text-gray-800" id="modalCategoryTitle">Edit Category</h3>
+      <button type="button" class="text-gray-400 hover:text-gray-700 text-2xl leading-none"
+        id="closeCategoryModal">&times;</button>
+    </div>
+
+    <!-- Body -->
+    <div class="flex flex-col md:flex-row flex-1 overflow-hidden">
+      <!-- Left Pane (Selected) -->
+      <div class="w-full md:w-1/2 flex flex-col border-r border-gray-100 bg-gray-50 h-full">
+        <div class="px-5 py-3 border-b border-gray-100 font-semibold text-gray-700 bg-white shrink-0">Selected (Drag to
+          Reorder)</div>
+        <div id="modalLeftPane" class="flex-1 overflow-y-auto p-4 space-y-3">
+          <!-- Selected items injected here -->
+        </div>
+      </div>
+
+      <!-- Right Pane (Available) -->
+      <div class="w-full md:w-1/2 flex flex-col bg-white h-full">
+        <div class="px-5 py-3 border-b border-gray-100 flex items-center gap-3 shrink-0">
+          <span class="font-semibold text-gray-700 whitespace-nowrap">Available Topics</span>
+          <input type="text" id="modalSearchInput"
+            class="text-sm bg-gray-50 border border-gray-200 rounded px-3 py-1 flex-1 outline-none focus:border-blue-500"
+            placeholder="Search...">
+        </div>
+        <div id="modalRightPane" class="flex-1 overflow-y-auto p-4 flex flex-wrap content-start gap-2">
+          <!-- Available items injected here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 shrink-0">
+      <button type="button"
+        class="px-4 py-2 rounded font-semibold text-gray-600 bg-white border border-gray-200 hover:bg-gray-100"
+        id="cancelCategoryModal">Cancel</button>
+      <button type="button" class="px-4 py-2 rounded font-semibold text-white bg-blue-600 hover:bg-blue-700"
+        id="saveCategoryModal">Save Changes</button>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+<script type="application/json" id="fullListsData">
+{
+  "interests": {{ INTERESTS_LIST | tojson }},
+  "talents": {{ TALENTS_LIST | tojson }},
+  "hobbies": {{ HOBBIES_LIST | tojson }},
+  "life_aim": {{ GOALS_LIST | tojson }},
+  "showcases": {{ current_user.get('showcases', []) | tojson }}
+}
+</script>
+<script>
+  const _data = JSON.parse(document.getElementById('fullListsData').textContent);
+  window.FULL_LISTS = _data;
+  window.CURRENT_SHOWCASES = _data.showcases;
+</script>
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 {% endblock %}

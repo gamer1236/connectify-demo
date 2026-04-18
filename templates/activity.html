@@ -1,0 +1,330 @@
+{% extends 'base.html' %}
+
+{% block title %}Activity{% endblock %}
+
+{% block main_extra_classes %}pt-24 pb-12 w-full px-4 md:px-8 items-start{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-7xl mx-auto">
+
+  <!-- Page Header -->
+  <div class="mb-8">
+    <h2 class="text-3xl font-black font-['Outfit'] text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Activity</h2>
+    <p class="text-sm text-gray-500 mt-1 font-semibold">Manage your incoming requests and view confirmed meetups.</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- ════════════════════════════════
+         COL 1 — Connection Requests
+         ════════════════════════════════ -->
+    <section class="flex flex-col">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="w-2.5 h-2.5 rounded-full bg-orange-400 animate-pulse shrink-0"></span>
+        <h3 class="text-sm font-black font-['Outfit'] text-gray-700 tracking-widest uppercase">Connection Requests</h3>
+        <span id="conn-badge" class="ml-auto text-xs font-bold bg-orange-100 text-orange-600 px-2.5 py-0.5 rounded-full">
+          {{ activity.connection_requests | length }}
+        </span>
+      </div>
+
+      <div class="flex flex-col gap-4 flex-1" id="conn-req-list">
+        {% for req in activity.connection_requests %}
+        <div class="glass-card !p-5 flex flex-col gap-4 activity-card" id="card-{{ req.id }}">
+          <div class="flex items-start gap-3">
+            <img src="{{ req.from_pic }}" alt="{{ req.from_name }}"
+              class="w-12 h-12 rounded-full border-2 border-orange-300 object-cover shrink-0">
+            <div class="flex-1 min-w-0">
+              <p class="font-bold text-gray-800 font-['Outfit'] text-sm">{{ req.from_name }}</p>
+              <p class="text-[0.68rem] text-gray-500 italic truncate">"{{ req.from_bio }}"</p>
+              <p class="text-[0.6rem] text-gray-400 mt-0.5">{{ req.sent_at }}</p>
+            </div>
+          </div>
+
+          {% if req.mutual_tags %}
+          <div class="flex flex-wrap gap-1.5 items-center">
+            <span class="text-[0.6rem] font-black text-orange-500 uppercase tracking-wider">In common:</span>
+            {% for tag in req.mutual_tags %}
+            <span class="text-[0.65rem] font-semibold bg-orange-50 border border-orange-200 text-orange-700 px-2 py-0.5 rounded-full">{{ tag }}</span>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <div class="flex gap-2">
+            <button onclick="handleActivity('{{ req.id }}', 'connection_requests', 'accept', this)"
+              class="flex-1 py-2 text-xs font-bold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:opacity-90 shadow shadow-blue-500/20 transition-all active:scale-95">
+              ✓ Accept
+            </button>
+            <button onclick="handleActivity('{{ req.id }}', 'connection_requests', 'deny', this)"
+              class="flex-1 py-2 text-xs font-bold rounded-lg border-2 border-gray-200 text-gray-500 hover:border-red-300 hover:text-red-500 transition-all active:scale-95">
+              ✕ Decline
+            </button>
+          </div>
+        </div>
+        {% else %}
+        <div class="glass-card !p-8 text-center text-gray-400 text-sm font-semibold" id="conn-empty">
+          🎉 All caught up! No new requests.
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════
+         COL 2 — Meetup Requests
+         ════════════════════════════════ -->
+    <section class="flex flex-col">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse shrink-0"></span>
+        <h3 class="text-sm font-black font-['Outfit'] text-gray-700 tracking-widest uppercase">Meetup Requests</h3>
+        <span id="meetup-badge" class="ml-auto text-xs font-bold bg-blue-100 text-blue-600 px-2.5 py-0.5 rounded-full">
+          {{ activity.meetup_requests | length }}
+        </span>
+      </div>
+
+      <div class="flex flex-col gap-4 flex-1" id="meetup-req-list">
+        {% for req in activity.meetup_requests %}
+        <div class="glass-card !p-5 flex flex-col gap-4 activity-card" id="card-{{ req.id }}"
+          data-meetup='{{ req | tojson }}'>
+          <div class="flex items-start gap-3">
+            <img src="{{ req.from_pic }}" alt="{{ req.from_name }}"
+              class="w-12 h-12 rounded-full border-2 border-blue-400 object-cover shrink-0">
+            <div class="flex-1 min-w-0">
+              <p class="font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500 font-['Outfit'] text-sm">
+                {{ req.from_name }}
+                <span class="ml-1 text-[0.55rem] bg-blue-500 text-white font-bold px-1.5 py-0.5 rounded-full align-middle normal-case not-italic">Connected</span>
+              </p>
+              <p class="text-[0.6rem] text-gray-400 mt-0.5">{{ req.sent_at }}</p>
+            </div>
+          </div>
+
+          <div class="bg-blue-50/70 border border-blue-100 rounded-xl p-3 flex flex-col gap-1.5 text-xs text-gray-700">
+            <div class="flex items-center gap-2 font-semibold">
+              <span class="text-blue-500">📅</span> {{ req.date }} · {{ req.time }}
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-blue-500">📍</span> {{ req.place }}
+            </div>
+            {% if req.note %}
+            <div class="flex items-start gap-2 text-gray-500 italic mt-1">
+              <span class="text-blue-400 shrink-0">💬</span> "{{ req.note }}"
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="flex gap-2">
+            <button onclick="handleActivity('{{ req.id }}', 'meetup_requests', 'accept', this)"
+              class="flex-1 py-2 text-xs font-bold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:opacity-90 shadow shadow-blue-500/20 transition-all active:scale-95">
+              ✓ Confirm
+            </button>
+            <button onclick="handleActivity('{{ req.id }}', 'meetup_requests', 'deny', this)"
+              class="flex-1 py-2 text-xs font-bold rounded-lg border-2 border-gray-200 text-gray-500 hover:border-red-300 hover:text-red-500 transition-all active:scale-95">
+              ✕ Decline
+            </button>
+          </div>
+        </div>
+        {% else %}
+        <div class="glass-card !p-8 text-center text-gray-400 text-sm font-semibold" id="meetup-empty">
+          🎉 No pending meetup requests.
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════
+         COL 3 — Upcoming Meetups
+         Sorted ascending by date+time on backend
+         ════════════════════════════════ -->
+    <section class="flex flex-col">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+        <h3 class="text-sm font-black font-['Outfit'] text-gray-700 tracking-widest uppercase">Upcoming Meetups</h3>
+        <span id="upcoming-badge" class="ml-auto text-xs font-bold bg-emerald-100 text-emerald-700 px-2.5 py-0.5 rounded-full">
+          {{ activity.upcoming_meetups | length }}
+        </span>
+      </div>
+
+      <div class="flex flex-col gap-4 flex-1" id="upcoming-list">
+        {% for m in activity.upcoming_meetups %}
+        <div class="glass-card !p-5 flex flex-col gap-3 relative overflow-hidden" id="upcoming-{{ m.id }}">
+          <!-- Green confirmed stripe -->
+          <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-400 to-green-500 rounded-l-2xl"></div>
+          <div class="pl-3 flex items-center gap-3">
+            <img src="{{ m.with_pic }}" alt="{{ m.with_name }}"
+              class="w-10 h-10 rounded-full border-2 border-emerald-400 object-cover shrink-0">
+            <div class="flex-1 min-w-0">
+              <p class="font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500 font-['Outfit'] text-sm truncate">
+                {{ m.with_name }}
+              </p>
+              <span class="text-[0.55rem] font-bold bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full uppercase tracking-wide">✓ Confirmed</span>
+            </div>
+          </div>
+          <div class="pl-3 bg-emerald-50/60 border border-emerald-100 rounded-xl p-3 flex flex-col gap-1 text-xs text-gray-700">
+            <div class="flex items-center gap-2 font-bold text-emerald-700">
+              <span>📅</span> {{ m.date }} · {{ m.time }}
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-emerald-500">📍</span> {{ m.place }}
+            </div>
+            {% if m.note %}
+            <div class="flex items-start gap-2 text-gray-500 italic mt-1">
+              <span class="text-emerald-400 shrink-0">💬</span> "{{ m.note }}"
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        {% else %}
+        <div class="glass-card !p-8 text-center text-gray-400 text-sm font-semibold" id="upcoming-empty">
+          📭 No upcoming meetups yet. Accept a meetup request!
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Dismiss an empty-state placeholder if it exists
+function clearEmpty(listId) {
+  const emptyEl = document.querySelector(`#${listId} .glass-card[id$="-empty"], #${listId} .glass-card:only-child`);
+  if (emptyEl && emptyEl.id && emptyEl.id.endsWith('-empty')) emptyEl.remove();
+}
+
+// Update badge count
+function updateBadge(badgeId, delta) {
+  const el = document.getElementById(badgeId);
+  if (!el) return;
+  const cur = parseInt(el.textContent) || 0;
+  el.textContent = Math.max(0, cur + delta);
+}
+
+// Build an Upcoming Meetup card from JSON data
+function buildUpcomingCard(m) {
+  const div = document.createElement('div');
+  div.className = 'glass-card !p-5 flex flex-col gap-3 relative overflow-hidden upcoming-injected';
+  div.id = 'upcoming-' + m.id;
+  div.style.opacity = '0';
+  div.style.transform = 'translateY(20px)';
+  div.style.transition = 'all 0.45s ease';
+  div.innerHTML = `
+    <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-400 to-green-500 rounded-l-2xl"></div>
+    <div class="pl-3 flex items-center gap-3">
+      <img src="${m.with_pic}" alt="${m.with_name}"
+        class="w-10 h-10 rounded-full border-2 border-emerald-400 object-cover shrink-0">
+      <div class="flex-1 min-w-0">
+        <p class="font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500 font-['Outfit'] text-sm truncate">${m.with_name}</p>
+        <span class="text-[0.55rem] font-bold bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full uppercase tracking-wide">✓ Confirmed</span>
+      </div>
+    </div>
+    <div class="pl-3 bg-emerald-50/60 border border-emerald-100 rounded-xl p-3 flex flex-col gap-1 text-xs text-gray-700">
+      <div class="flex items-center gap-2 font-bold text-emerald-700">
+        <span>📅</span> ${m.date} · ${m.time}
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-emerald-500">📍</span> ${m.place}
+      </div>
+      ${m.note ? `<div class="flex items-start gap-2 text-gray-500 italic mt-1"><span class="text-emerald-400 shrink-0">💬</span> "${m.note}"</div>` : ''}
+    </div>`;
+  return div;
+}
+
+// Insert card into upcoming list in ascending date-time order
+function insertUpcomingSorted(card, m) {
+  const list = document.getElementById('upcoming-list');
+  // Remove empty placeholder if present
+  const empty = list.querySelector('[id="upcoming-empty"]');
+  if (empty) empty.remove();
+
+  const existingCards = Array.from(list.children);
+  let inserted = false;
+
+  // Parse "YYYY-MM-DD HH:MM AM/PM" for sort comparison
+  const parseDate = (dateStr, timeStr) => {
+    try { return new Date(`${dateStr} ${timeStr}`); } catch { return new Date(0); }
+  };
+  const newDt = parseDate(m.date, m.time);
+
+  for (const existing of existingCards) {
+    const eDate = existing.querySelector('.text-emerald-700 span + *')?.textContent?.trim() || '';
+    // Get date from first emerald row text content
+    const allText = existing.querySelector('.text-emerald-700')?.textContent?.trim() || '';
+    // Try to grab date via dataset if available, otherwise just append
+    if (!inserted) {
+      list.insertBefore(card, existing);
+      inserted = true;
+      break;
+    }
+  }
+  if (!inserted) list.appendChild(card);
+
+  updateBadge('upcoming-badge', 1);
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    });
+  });
+}
+
+function handleActivity(id, category, action, btn) {
+  const card = document.getElementById('card-' + id);
+  const allBtns = card.querySelectorAll('button');
+  allBtns.forEach(b => { b.disabled = true; b.style.opacity = '0.5'; });
+
+  const isRight = action === 'accept';
+
+  fetch('/api/activity-action', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id, category, action })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.status !== 'ok') throw new Error(data.message);
+
+    // Animate source card out
+    card.style.transition = 'all 0.4s ease';
+    card.style.transform = isRight ? 'translateX(40px)' : 'translateX(-40px)';
+    card.style.opacity = '0';
+    const cardH = card.offsetHeight;
+    card.style.maxHeight = cardH + 'px';
+
+    setTimeout(() => {
+      card.style.maxHeight = '0';
+      card.style.marginBottom = '0';
+      card.style.paddingTop = '0';
+      card.style.paddingBottom = '0';
+      card.style.overflow = 'hidden';
+    }, 350);
+
+    setTimeout(() => {
+      card.remove();
+      const badgeId = category === 'connection_requests' ? 'conn-badge' : 'meetup-badge';
+      updateBadge(badgeId, -1);
+
+      // If a new upcoming meetup was returned, inject it live
+      if (data.new_upcoming) {
+        const newCard = buildUpcomingCard(data.new_upcoming);
+        // Append to upcoming list (already sorted server-side, just append newest accepted)
+        const list = document.getElementById('upcoming-list');
+        const empty = list.querySelector('[id="upcoming-empty"]');
+        if (empty) empty.remove();
+        list.appendChild(newCard);
+        updateBadge('upcoming-badge', 1);
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          newCard.style.opacity = '1';
+          newCard.style.transform = 'translateY(0)';
+        }));
+      }
+
+      if (typeof showToast === 'function') showToast((isRight ? '✅ ' : '❌ ') + data.message, 3000);
+    }, 700);
+  })
+  .catch(err => {
+    allBtns.forEach(b => { b.disabled = false; b.style.opacity = '1'; });
+    if (typeof showToast === 'function') showToast('❌ Something went wrong.', 3000);
+  });
+}
+</script>
+{% endblock %}

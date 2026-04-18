@@ -14,23 +14,27 @@
 {% block content %}
 <div class="card-wrapper w-full max-w-4xl mx-auto overflow-hidden pb-10 mt-5">
   <div class="glass-card">
-    <h2 class="text-2xl font-bold text-center mb-6" style="font-family: var(--font-head); color: var(--text-primary);">Complete Your Profile</h2>
-    <p class="text-center text-sm text-gray-500 mb-8">Select tags to let the network know your interests, talents, and goals.</p>
+    <h2 class="text-2xl font-bold text-center mb-6" style="font-family: var(--font-head); color: var(--text-primary);">
+      Complete Your Profile</h2>
+    <p class="text-center text-sm text-gray-500 mb-8">Select tags to let the network know your interests, talents, and
+      goals.</p>
 
-    <form method="POST" action="{{ url_for('create_profile') }}" id="profileForm">
-      
+    <form method="POST" action="{{ url_for('create_profile') }}" id="profileForm" enctype="multipart/form-data">
+
       <!-- Basics row -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div class="field-group">
           <label class="field-label" for="full_name">Full Name</label>
           <div class="input-shell">
-            <input type="text" id="full_name" name="full_name" class="text-input pl-4" value="{{ session.get('user_name', '') }}" required />
+            <input type="text" id="full_name" name="full_name" class="text-input pl-4"
+              value="{{ session.get('user_name', '') }}" required />
           </div>
         </div>
         <div class="field-group">
           <label class="field-label" for="gender">Gender</label>
           <div class="input-shell">
-            <select id="gender" name="gender" class="text-input pl-4 bg-transparent outline-none appearance-none" style="width:100%" required>
+            <select id="gender" name="gender" class="text-input pl-4 bg-transparent outline-none appearance-none"
+              style="width:100%" required>
               <option value="" disabled selected>Select Gender</option>
               <option value="Male">Male</option>
               <option value="Female">Female</option>
@@ -48,46 +52,108 @@
         <div class="field-group md:col-span-2">
           <label class="field-label" for="bio">Short Bio</label>
           <div class="input-shell" style="height: auto;">
-            <textarea id="bio" name="bio" rows="2" class="text-input pl-4 py-2 w-full bg-transparent resize-none outline-none" placeholder="Write a little about yourself..."></textarea>
+            <textarea id="bio" name="bio" rows="2"
+              class="text-input pl-4 py-2 w-full bg-transparent resize-none outline-none"
+              placeholder="Write a little about yourself..."></textarea>
           </div>
         </div>
       </div>
 
       <hr class="my-6 border-white/40">
-      
+
       <!-- Hidden inputs to store multi-select values -->
       <input type="hidden" name="interests" id="hidden_interests">
       <input type="hidden" name="talents" id="hidden_talents">
       <input type="hidden" name="hobbies" id="hidden_hobbies">
       <input type="hidden" name="life_aim" id="hidden_life_aim">
 
-      <h3 class="font-bold tracking-widest text-[#1a5aff] mb-4 font-['Outfit'] text-lg border-b border-black/10 pb-2">Interests</h3>
-      <div class="flex flex-wrap gap-2 mb-8" id="cat_interests">
+      <div class="flex justify-between items-end border-b border-black/10 pb-2 mb-4">
+        <h3 class="font-bold tracking-widest text-[#1a5aff] font-['Outfit'] text-lg">Interests</h3>
+        <input type="text" id="search_interests"
+          class="text-sm bg-transparent border-b border-gray-300 focus:border-[#1a5aff] outline-none px-2 py-1 w-48 transition-colors"
+          placeholder="Search interests...">
+      </div>
+      <div class="flex flex-wrap gap-2 mb-2" id="cat_interests">
         {% for item in INTERESTS_LIST %}
-          <span class="tag-badge-selectable border border-blue-200 cursor-pointer text-xs px-3 py-1.5 rounded-full transition-all text-gray-600 hover:bg-blue-50" data-val="{{ item }}">{{ item }}</span>
+        <span
+          class="tag-badge-selectable border border-blue-200 cursor-pointer text-xs px-3 py-1.5 rounded-full transition-all text-gray-600 hover:bg-blue-50"
+          data-val="{{ item }}">{{ item }}</span>
         {% endfor %}
       </div>
+      <button type="button" class="text-sm text-[#1a5aff] hover:underline mb-8 btn-view-all"
+        data-target="cat_interests">View All</button>
 
-      <h3 class="font-bold tracking-widest text-[#1a5aff] mb-4 font-['Outfit'] text-lg border-b border-black/10 pb-2">Talents</h3>
-      <div class="flex flex-wrap gap-2 mb-8" id="cat_talents">
+      <div class="flex justify-between items-end border-b border-black/10 pb-2 mb-4">
+        <h3 class="font-bold tracking-widest text-[#1a5aff] font-['Outfit'] text-lg">Talents</h3>
+        <input type="text" id="search_talents"
+          class="text-sm bg-transparent border-b border-gray-300 focus:border-[#1a5aff] outline-none px-2 py-1 w-48 transition-colors"
+          placeholder="Search talents...">
+      </div>
+      <div class="flex flex-wrap gap-2 mb-2" id="cat_talents">
         {% for item in TALENTS_LIST %}
-          <span class="tag-badge-selectable border border-blue-200 cursor-pointer text-xs px-3 py-1.5 rounded-full transition-all text-gray-600 hover:bg-blue-50" data-val="{{ item }}">{{ item }}</span>
+        <span
+          class="tag-badge-selectable border border-blue-200 cursor-pointer text-xs px-3 py-1.5 rounded-full transition-all text-gray-600 hover:bg-blue-50"
+          data-val="{{ item }}">{{ item }}</span>
         {% endfor %}
       </div>
+      <button type="button" class="text-sm text-[#1a5aff] hover:underline mb-4 btn-view-all"
+        data-target="cat_talents">View All</button>
 
-      <h3 class="font-bold tracking-widest text-[#1a5aff] mb-4 font-['Outfit'] text-lg border-b border-black/10 pb-2">Hobbies</h3>
-      <div class="flex flex-wrap gap-2 mb-8" id="cat_hobbies">
+      <!-- Showcase Talents -->
+      <div id="showcase_talents" class="hidden bg-blue-50/50 border border-blue-100 rounded-xl p-4 mb-8">
+        <h4 class="text-sm font-semibold text-blue-800 mb-2">Showcase your Talent (Optional)</h4>
+        <div class="flex flex-col gap-4">
+          <select name="showcase_talent_topic" id="showcase_talent_topic"
+            class="text-sm border border-blue-200 rounded px-2 py-1 bg-white outline-none w-full md:w-auto self-start">
+            <option value="" disabled selected>Select talent to showcase</option>
+          </select>
+          <div id="showcase_talent_inputs_container" class="w-full"></div>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-end border-b border-black/10 pb-2 mb-4">
+        <h3 class="font-bold tracking-widest text-[#1a5aff] font-['Outfit'] text-lg">Hobbies</h3>
+        <input type="text" id="search_hobbies"
+          class="text-sm bg-transparent border-b border-gray-300 focus:border-[#1a5aff] outline-none px-2 py-1 w-48 transition-colors"
+          placeholder="Search hobbies...">
+      </div>
+      <div class="flex flex-wrap gap-2 mb-2" id="cat_hobbies">
         {% for item in HOBBIES_LIST %}
-          <span class="tag-badge-selectable border border-blue-200 cursor-pointer text-xs px-3 py-1.5 rounded-full transition-all text-gray-600 hover:bg-blue-50" data-val="{{ item }}">{{ item }}</span>
+        <span
+          class="tag-badge-selectable border border-blue-200 cursor-pointer text-xs px-3 py-1.5 rounded-full transition-all text-gray-600 hover:bg-blue-50"
+          data-val="{{ item }}">{{ item }}</span>
         {% endfor %}
+      </div>
+      <button type="button" class="text-sm text-[#1a5aff] hover:underline mb-4 btn-view-all"
+        data-target="cat_hobbies">View All</button>
+
+      <!-- Showcase Hobbies -->
+      <div id="showcase_hobbies" class="hidden bg-blue-50/50 border border-blue-100 rounded-xl p-4 mb-8">
+        <h4 class="text-sm font-semibold text-blue-800 mb-2">Showcase your Hobby (Optional)</h4>
+        <div class="flex flex-col gap-4">
+          <select name="showcase_hobby_topic" id="showcase_hobby_topic"
+            class="text-sm border border-blue-200 rounded px-2 py-1 bg-white outline-none w-full md:w-auto self-start">
+            <option value="" disabled selected>Select hobby to showcase</option>
+          </select>
+          <div id="showcase_hobby_inputs_container" class="w-full"></div>
+        </div>
       </div>
 
-      <h3 class="font-bold tracking-widest text-[#1a5aff] mb-4 font-['Outfit'] text-lg border-b border-black/10 pb-2">Life Goals</h3>
-      <div class="flex flex-wrap gap-2 mb-8" id="cat_life_aim">
+      <div class="flex justify-between items-end border-b border-black/10 pb-2 mb-4">
+        <h3 class="font-bold tracking-widest text-[#1a5aff] font-['Outfit'] text-lg">Life Goals</h3>
+        <input type="text" id="search_life_aim"
+          class="text-sm bg-transparent border-b border-gray-300 focus:border-[#1a5aff] outline-none px-2 py-1 w-48 transition-colors"
+          placeholder="Search goals...">
+      </div>
+      <div class="flex flex-wrap gap-2 mb-2" id="cat_life_aim">
         {% for item in GOALS_LIST %}
-          <span class="tag-badge-selectable border border-blue-200 cursor-pointer text-xs px-3 py-1.5 rounded-full transition-all text-gray-600 hover:bg-blue-50" data-val="{{ item }}">{{ item }}</span>
+        <span
+          class="tag-badge-selectable border border-blue-200 cursor-pointer text-xs px-3 py-1.5 rounded-full transition-all text-gray-600 hover:bg-blue-50"
+          data-val="{{ item }}">{{ item }}</span>
         {% endfor %}
       </div>
+      <button type="button" class="text-sm text-[#1a5aff] hover:underline mb-8 btn-view-all"
+        data-target="cat_life_aim">View All</button>
 
       <button type="submit" class="cta-btn mt-6" id="saveProfileBtn">
         <span class="btn-text">Join The Network</span>
